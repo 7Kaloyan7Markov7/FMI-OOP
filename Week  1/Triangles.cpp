@@ -150,5 +150,7 @@ int main()
 	sortArrs(arrTri, areas, N);
 	printTriangles(arrTri, areas, N);
 
+	delete[] arrTri;
+	delete[] areas;
 	return 0;
 }
