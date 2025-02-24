@@ -13,6 +13,8 @@ size_t getFileSize(const char* fileName)
 	size_t fileSize = ifs.tellg();
 	ifs.seekg(prevPos);
 
+	ifs.close();
+
 	return fileSize;
 }
 
