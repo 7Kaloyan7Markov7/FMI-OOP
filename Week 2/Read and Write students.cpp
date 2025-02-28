@@ -46,6 +46,7 @@ void readStudentFromFile(FMIStudent& s, std::ifstream& ifs)
 	if (!ifs.is_open()) return;
 	ifs.getline(s.name,GLOBAL_CONSTANTS::MAX_NAME_SIZE);
 	ifs >> s.years;
+
 	for (int i = 0; i < s.countOfSubjects; ++i)
 	{
 		ifs >> s.grades[i];
@@ -67,13 +68,14 @@ void readStudentFromFile(FMIStudent& s, std::ifstream& ifs)
 	default: std::cout << "Error";
 		break;
 	}
+	ifs.ignore();
 
 }
 
 void writeStudentArrayToFile(const char* fileName, const FMIStudent* students, size_t size)
 {
 	if (!fileName) return;
-	std::ofstream ofs("test.txt");
+	std::ofstream ofs(fileName);
 	if (!ofs.is_open()) return;
 
 	for (size_t i = 0; i < size; ++i)
@@ -95,19 +97,20 @@ FMIStudent* readStudentArrayFromFile(const char* fileName, size_t& size)
 	}
 
 	ifs.close();
+	return res;
 }
 
 void printStudent(const FMIStudent& res)
 {
 	std::cout << res.name << " ";
 	std::cout << res.years << " ";
-	std::cout << "{ ";
+	std::cout << "{";
 	for (int i = 0; i < res.countOfSubjects; ++i)
 	{
 		std::cout << res.grades[i];
 		if (i != res.countOfSubjects - 1) std::cout << ",";
 	}
-	std::cout << " } ";
+	std::cout << "} ";
 
 	switch (res.major)
 	{
@@ -134,13 +137,13 @@ int main()
 	
 	writeStudentArrayToFile("test.txt", arr, 2);
 	size_t size = 2;
-
 	FMIStudent* res = readStudentArrayFromFile("test.txt", size);
 	
 	for (int i = 0; i < 2; ++i)
 	{
 		printStudent(res[i]);
 	}
-
+	
+	delete[] res;
 	return 0;
 }
