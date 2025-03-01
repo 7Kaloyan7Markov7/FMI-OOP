@@ -44,7 +44,7 @@ void saveStudentToFile(const FMIStudent& s, std::ofstream& ofs)
 void readStudentFromFile(FMIStudent& s, std::ifstream& ifs)
 {
 	if (!ifs.is_open()) return;
-	ifs.getline(s.name,GLOBAL_CONSTANTS::MAX_NAME_SIZE);
+	ifs.getline(s.name, GLOBAL_CONSTANTS::MAX_NAME_SIZE);
 	ifs >> s.years;
 
 	for (int i = 0; i < s.countOfSubjects; ++i)
@@ -102,15 +102,19 @@ FMIStudent* readStudentArrayFromFile(const char* fileName, size_t& size)
 
 void printStudent(const FMIStudent& res)
 {
+	std::cout << "|";
 	std::cout << res.name << " ";
+	std::cout << "|";
 	std::cout << res.years << " ";
+	std::cout << "|";
 	std::cout << "{";
 	for (int i = 0; i < res.countOfSubjects; ++i)
 	{
 		std::cout << res.grades[i];
 		if (i != res.countOfSubjects - 1) std::cout << ",";
 	}
-	std::cout << "} ";
+	std::cout << "}";
+	std::cout << "|";
 
 	switch (res.major)
 	{
@@ -125,25 +129,21 @@ void printStudent(const FMIStudent& res)
 	default: std::cout << "Error";
 		break;
 	}
+	std::cout << "|";
 	std::cout << std::endl;
 }
 
 int main()
 {
-
-	FMIStudent s{ "Name",19,{3,3,3},3,Major::SE };	
-	FMIStudent s2{ "Name2",20,{3,3,4},3,Major::CS };
-	FMIStudent arr[2] = { s, s2 };
-	
-	writeStudentArrayToFile("test.txt", arr, 2);
-	size_t size = 2;
+	size_t size = 0;
+	std::cin >> size;
 	FMIStudent* res = readStudentArrayFromFile("test.txt", size);
-	
-	for (int i = 0; i < 2; ++i)
+
+	for (int i = 0; i < size; ++i)
 	{
 		printStudent(res[i]);
 	}
-	
+
 	delete[] res;
 	return 0;
 }
