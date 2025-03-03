@@ -5,7 +5,7 @@ namespace CONSTANTS
 {
 	const size_t  MAX_SIZE = 1024;
 }
-
+//yes
 void selfPrint(std::ifstream& ifs)
 {
 	if (!ifs.is_open()) return;
