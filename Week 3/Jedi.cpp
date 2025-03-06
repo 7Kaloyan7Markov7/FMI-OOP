@@ -5,6 +5,9 @@ namespace GLOBAL_CONSTANTS
 {
 	const int MAX_NAME_SIZE = 50;
 	const int MAX_JEDI_COUNT = 100;
+	const int MAX_BUFF_SIZE = 200;
+	const int NUM_OF_COLORS = 5;
+	const int NUM_OF_TYPES = 3;
 }
 
 enum class Color
@@ -49,7 +52,7 @@ size_t sizeOfFile(const char* fileName)
 {
 	size_t size = 0;
 	if (!fileName) return size;
-	
+
 	std::ifstream ifs(fileName);
 	if (!ifs.is_open()) return size;
 
@@ -72,8 +75,52 @@ size_t strLen(const char* str)
 	return index;
 }
 
+size_t getNumOfLines(std::ifstream& ifs)
+{
+	size_t lines = 0;
+	int prevPos = ifs.tellg();
+
+	if (!ifs.is_open()) return lines;
+	char buff[GLOBAL_CONSTANTS::MAX_BUFF_SIZE];
+
+	while (!ifs.eof())
+	{
+		ifs.getline(buff,GLOBAL_CONSTANTS::MAX_BUFF_SIZE);
+		lines++;
+	}
+
+	ifs.clear();
+	ifs.seekg(prevPos);
+
+	return lines;
+}
+
+void swap(Jedi& first, Jedi& sec)
+{
+	Jedi temp = first;
+	first = sec;
+	sec = temp;
+}
+
+int getHighest(int* arr)
+{
+	if (!arr) return -1;
+
+	int highest = arr[0];
+	int highestIndex = 0;
+
+	for (size_t i = 1; i < GLOBAL_CONSTANTS::NUM_OF_COLORS; ++i)
+	{
+		if (highest < arr[i]) highestIndex = i;
+	}
+
+	return highestIndex;
+}
+
 bool strCmp(const char* str1, const char* str2)
 {
+	if (!str1 || !str2) return false;
+
 	size_t size1 = strLen(str1);
 	size_t size2 = strLen(str2);
 	if (size1 != size2) return false;
@@ -95,6 +142,68 @@ void strCopy(const char* source, char* dest)
 		index++;
 	}
 	dest[index] = '\0';
+}
+
+void printColor(const Color& color)
+{
+	switch ((int)color)
+	{
+	case 0: std::cout << "Red";
+		break;
+	case 1: std::cout << "Yellow";
+		break;
+	case 2: std::cout << "Green";
+		break;
+	case 3: std::cout << "Blue";
+		break;
+	case 4: std::cout << "Purple";
+		break;
+	case 5: std::cout << "Not assigned";
+		break;
+	default: std::cout << "Error";
+		break;
+	}
+}
+
+void printType(const Type& type)
+{
+	switch ((int)type)
+	{
+	case 0: std::cout << "Signle bladed";
+		break;
+	case 1: std::cout << "Double bladed";
+		break;
+	case 2: std::cout << "Crossguard";
+		break;
+	case 3: std::cout << "Not assigned";
+		break;
+	default: std::cout << "Error";
+		break;
+	}
+}
+
+Color getColor(int num)
+{
+	switch (num)
+	{
+	case 0: return Color::RED;
+	case 1: return Color::YELLOW;
+	case 2: return Color::GREEN;
+	case 3: return Color::BLUE;
+	case 4: return Color::PURPLE;
+	default: return Color::NOT_ASSIGNED;
+	}
+}
+
+Type getType(int num)
+{
+	switch (num)
+	{
+	case 0: return Type::SINGLE_BLADED;
+	case 1: return Type::DOUBLE_BLADED;
+	case 2: return Type::CROSSGUARD;
+	default: return Type::NOT_ASSIGNED;
+	}
 }
 
 Jedi createJedi(const char* name, size_t age, size_t power, const LightSaber& saber)
@@ -155,37 +264,32 @@ void removeJedi(JediCollection& collection, const char* name)
 
 void printJedi(const Jedi& jedi)
 {
-	std::cout << "Jedi: " << std::endl;
-	std::cout << "Name: " << jedi.name << std::endl;
-	std::cout << "Age: " << jedi.age << std::endl;
-	std::cout << "Power: " << jedi.power << std::endl;
-	std::cout << "Saber: " << (int)jedi.lightSaber.color << "," << (int)jedi.lightSaber.type << std::endl;
+	
+	std::cout << "| " << jedi.name << " | " << jedi.age << " | " << jedi.power << " | ";
+	printColor(jedi.lightSaber.color);
+	std::cout << "-";
+	printType(jedi.lightSaber.type);
+	std::cout << " | " << std::endl;
 }
 
 void printJediCollection(const JediCollection& collection)
 {
+	std::cout << "| Jedi name | age | power | lightsaber |" << std::endl;
+	std::cout << "|-----------|-----|-------|------------|" << std::endl;
 	for (size_t i = 0; i < collection.currentCount; ++i)
 	{
 		printJedi(collection.jediArr[i]);
 	}
 }
 
-void saveJediToBinary(const Jedi& jedi, std::ofstream& ofs)
-{
-	ofs.write((const char*)&jedi, sizeof(jedi));
-}
-
 void saveCollectionToBinary(const char* fileName, const JediCollection& collection)
 {
 	if (!fileName) return;
 
-	std::ofstream ofs(fileName,std::ios::binary);
+	std::ofstream ofs(fileName, std::ios::binary);
 	if (!ofs.is_open()) return;
 
-	for (size_t i = 0; i < collection.currentCount; ++i)
-	{
-		saveJediToBinary(collection.jediArr[i], ofs);
-	}
+	ofs.write((const char*)&collection, sizeof(collection));
 
 	ofs.close();
 }
@@ -193,27 +297,124 @@ void saveCollectionToBinary(const char* fileName, const JediCollection& collecti
 JediCollection readCollectionFromBinary(const char* fileName)
 {
 	JediCollection res;
-	
+
 	if (!fileName) return res;
 	std::ifstream ifs(fileName, std::ios::binary);
 
 	if (!ifs.is_open()) return res;
-	size_t size = sizeOfFile(fileName);
-	size_t sizeOfJedi = sizeof(Jedi);
-
-	for (size_t i = 0; i < size / sizeOfJedi; ++i)
-	{
-		ifs.read((char*)&res.jediArr[i], sizeof(Jedi));
-	}
-
-
+	ifs.read((char*)&res, sizeof(JediCollection));
 
 	ifs.close();
 	return res;
 }
 
+void saveJediToTxt(const Jedi& jedi, std::ofstream& ofs)
+{
+	if (!ofs.is_open()) return;
+
+	ofs << jedi.name << " " << jedi.age << " " << jedi.power << " " << (int)jedi.lightSaber.color << " " << (int)jedi.lightSaber.type;
+}
+
+void saveCollectionToTxt(const char* fileName, const JediCollection& collection)
+{
+	if (!fileName) return;
+
+	std::ofstream ofs(fileName);
+	if (!ofs.is_open()) return;
+	for (size_t i = 0; i < collection.currentCount; ++i)
+	{
+		saveJediToTxt(collection.jediArr[i], ofs);
+		if(i != collection.currentCount - 1) ofs << '\n';
+	}
+
+	ofs.close();
+}
+
+JediCollection readCollectionFromTxt(const char* fileName)
+{
+	JediCollection res;
+	if (!fileName) return res;
+
+	std::ifstream ifs(fileName);
+	res.currentCount = getNumOfLines(ifs);
+	for (size_t i = 0; i < res.currentCount; ++i)
+	{
+		ifs >> res.jediArr[i].name;
+		ifs >> res.jediArr[i].age;
+		ifs >> res.jediArr[i].power;
+
+		int temp = 0;
+		ifs >> temp;
+		res.jediArr[i].lightSaber.color = getColor(temp);
+		ifs >> temp;
+		res.jediArr[i].lightSaber.type = getType(temp);
+	}
+
+	ifs.close();
+
+	return res;
+}
+
+void sortByAge(JediCollection& collection)
+{
+	for (size_t i = 0; i < collection.currentCount - 1; ++i)
+	{
+		for (size_t j = 0; j < collection.currentCount - i - 1; ++j)
+		{
+			if (collection.jediArr[j].age > collection.jediArr[j + 1].age)
+			{
+				swap(collection.jediArr[j], collection.jediArr[j + 1]);
+			}
+		}
+	}
+}
+
+void sortByPower(JediCollection& collection)
+{
+	for (size_t i = 0; i < collection.currentCount - 1; ++i)
+	{
+		for (size_t j = 0; j < collection.currentCount - i - 1; ++j)
+		{
+			if (collection.jediArr[j].power > collection.jediArr[j + 1].power)
+			{
+				swap(collection.jediArr[j], collection.jediArr[j + 1]);
+			}
+		}
+	}
+}
+
+Color mostPopularSaberColor(const JediCollection& collection)
+{
+	int hist[GLOBAL_CONSTANTS::NUM_OF_COLORS] = {};
+	for (size_t i = 0; i < collection.currentCount; ++i)
+	{
+		hist[(int)collection.jediArr[i].lightSaber.color]++;
+	}
+	
+	int mostPop = getHighest(hist);
+	Color res = getColor(mostPop);
+	return res;
+}
+
+Type mostPopularSaberType(const JediCollection& collection)
+{
+	int hist[GLOBAL_CONSTANTS::NUM_OF_TYPES] = {};
+	for (size_t i = 0; i < collection.currentCount; ++i)
+	{
+		hist[(int)collection.jediArr[i].lightSaber.color]++;
+	}
+
+	int mostPop = getHighest(hist);
+	Type res = getType(mostPop);
+	return res;
+}
+
 int main()
 {
+	JediCollection collection;
+	Jedi jedi1 = createJedi("Koki", 21, 9001, Color::RED, Type::SINGLE_BLADED);
+	Jedi jedi2 = createJedi("Yoan", 41, 340, Color::RED, Type::CROSSGUARD);
+
 
 	return 0;
 }
