@@ -8,6 +8,7 @@ namespace GLOBAL_CONSTANTS
 	const int MAX_BUFF_SIZE = 200;
 	const int NUM_OF_COLORS = 5;
 	const int NUM_OF_TYPES = 3;
+	const int FIRST = 0;
 }
 
 enum class Color
@@ -102,14 +103,14 @@ void swap(Jedi& first, Jedi& sec)
 	sec = temp;
 }
 
-int getHighest(int* arr)
+int getHighest(const int* arr, int size)
 {
 	if (!arr) return -1;
 
-	int highest = arr[0];
+	int highest = arr[GLOBAL_CONSTANTS::FIRST];
 	int highestIndex = 0;
 
-	for (size_t i = 1; i < GLOBAL_CONSTANTS::NUM_OF_COLORS; ++i)
+	for (size_t i = 1; i < size; ++i)
 	{
 		if (highest < arr[i]) highestIndex = i;
 	}
@@ -391,7 +392,7 @@ Color mostPopularSaberColor(const JediCollection& collection)
 		hist[(int)collection.jediArr[i].lightSaber.color]++;
 	}
 	
-	int mostPop = getHighest(hist);
+	int mostPop = getHighest(hist, GLOBAL_CONSTANTS::NUM_OF_COLORS);
 	Color res = getColor(mostPop);
 	return res;
 }
@@ -404,17 +405,14 @@ Type mostPopularSaberType(const JediCollection& collection)
 		hist[(int)collection.jediArr[i].lightSaber.color]++;
 	}
 
-	int mostPop = getHighest(hist);
+	int mostPop = getHighest(hist, GLOBAL_CONSTANTS::NUM_OF_TYPES);
 	Type res = getType(mostPop);
 	return res;
 }
 
 int main()
 {
-	JediCollection collection;
-	Jedi jedi1 = createJedi("Koki", 21, 9001, Color::RED, Type::SINGLE_BLADED);
-	Jedi jedi2 = createJedi("Yoan", 41, 340, Color::RED, Type::CROSSGUARD);
-
-
+	
+	
 	return 0;
 }
