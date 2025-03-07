@@ -9,6 +9,8 @@ namespace GLOBAL_CONSTANTS
 	const int NUM_OF_COLORS = 5;
 	const int NUM_OF_TYPES = 3;
 	const int FIRST = 0;
+	const char FIRST_ROW[] = "| Jedi | age | power | lightsaber |";
+	const char SEC_ROW[] = "|------|-----|-------|------------|";
 }
 
 enum class Color
@@ -120,8 +122,9 @@ int getHighest(const int* arr, int size)
 
 bool strCmp(const char* str1, const char* str2)
 {
+	if (!str1 && !str2) return true;
 	if (!str1 || !str2) return false;
-
+	
 	size_t size1 = strLen(str1);
 	size_t size2 = strLen(str2);
 	if (size1 != size2) return false;
@@ -275,8 +278,8 @@ void printJedi(const Jedi& jedi)
 
 void printJediCollection(const JediCollection& collection)
 {
-	std::cout << "| Jedi name | age | power | lightsaber |" << std::endl;
-	std::cout << "|-----------|-----|-------|------------|" << std::endl;
+	std::cout << GLOBAL_CONSTANTS::FIRST_ROW << std::endl;
+	std::cout << GLOBAL_CONSTANTS::SEC_ROW << std::endl;
 	for (size_t i = 0; i < collection.currentCount; ++i)
 	{
 		printJedi(collection.jediArr[i]);
@@ -412,7 +415,6 @@ Type mostPopularSaberType(const JediCollection& collection)
 
 int main()
 {
-	
 	
 	return 0;
 }
