@@ -32,7 +32,7 @@ private:
 		while (str[index] != '\0') index++;
 
 		return index;
-	} 
+	}
 
 	void strCopy(const char* source, char* dest)
 	{
@@ -54,7 +54,7 @@ private:
 		size_t sizeFirst = strLen(first);
 		size_t sizeSec = strLen(sec);
 		if (sizeFirst != sizeSec) return false;
-		
+
 		int index = 0;
 		while (first[index] == sec[index] && first[index] != '\0') index++;
 
@@ -76,14 +76,12 @@ public:
 	void setName(const char* name)
 	{
 		if (!name) return;
-		if (strCmp(name, this->brandName)) return;
+		if (name == brandName) return;
 
 		size_t size = strLen(name);
 
-		if (this->brandName)
-		{
-			delete[] brandName;
-		}
+		delete[] brandName;
+		brandName = nullptr;
 
 		brandName = new char[size + 1];
 		strCopy(name, brandName);
@@ -143,6 +141,7 @@ public:
 		{
 			std::cout << this->kilometers[i];
 		}
+		std::cout << std::endl;
 	}
 
 	void writeOnFile(const char* fileName) const
@@ -204,12 +203,6 @@ public:
 
 int main()
 {
-	int arr[] = {1,2,3,4,5};
-	Car a("Subaru", 2025, 190, arr, 5);
-	
-	a.printCar();
-	a.readFromFile("Test7.txt");
-	std::cout << a.getBrandName();
 
 	return 0;
 }
