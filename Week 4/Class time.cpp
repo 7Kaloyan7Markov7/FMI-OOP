@@ -11,6 +11,8 @@ namespace GLOBAL_CONSTANTS
 	const int PARTY_START = 23;
 	const int PARTY_END = 6;
 	const int MAX_NUMBER_OF_TIMES = 10;
+	const int START_OF_DINNER = 20 * 3600 + 30 * 60;
+	const int END_OF_DINNER = 22 * 3600;
 }
 
 class Time
@@ -97,25 +99,25 @@ private:
 		std::cout << this->seconds;
 	}
 	//print ^
-	bool validateHours(int hours)
+	bool validateHours(int hours) const
 	{
 		if (hours < 0 || hours > 23) return false;
 		return true;
 	}
 
-	bool validateMinutes(int minutes)
+	bool validateMinutes(int minutes) const
 	{
 		if (minutes < 0 || minutes > 59) return false;
 		return true;
 	}
 
-	bool validateSeconds(int seconds)
+	bool validateSeconds(int seconds) const
 	{
 		if (seconds < 0 || seconds > 59) return false;
 		return true;
 	}
 
-	bool validate(int hours, int minutes, int sec)
+	bool validate(int hours, int minutes, int sec) const
 	{
 		return validateHours(hours) && validateMinutes(minutes) && validateSeconds(sec);
 	}
@@ -132,15 +134,16 @@ public:
 	Time() : hours(GLOBAL_CONSTANTS::DEFAULT_TIME),
 		minutes(GLOBAL_CONSTANTS::DEFAULT_TIME),
 		seconds(GLOBAL_CONSTANTS::DEFAULT_TIME),
-		timeInSeconds(GLOBAL_CONSTANTS::DEFAULT_TIME){};
+		timeInSeconds(GLOBAL_CONSTANTS::DEFAULT_TIME) {};
 
 	Time(int hours, int minutes, int seconds)
 	{
-		if (!validate(hours, minutes, seconds)) 
+		if (!validate(hours, minutes, seconds))
 		{
 			bigSetter(GLOBAL_CONSTANTS::DEFAULT_TIME,
 				GLOBAL_CONSTANTS::DEFAULT_TIME,
 				GLOBAL_CONSTANTS::DEFAULT_TIME);
+			std::cout << "Invalid data";
 		}
 		else
 		{
@@ -183,12 +186,10 @@ public:
 	//getters ^
 	const Time getRemainingTime() const
 	{
-		if (!this->hours && !this->minutes && !this->seconds) return { 0,0,0 };
-
 		int remainingSeconds = getRemainingSeconds();
 		int remainingHours = secToHours(remainingSeconds);
 		int remainingMinutes = secToMinutes(remainingSeconds);
-		int seconds = getSecRem(remainingSeconds);
+		int seconds = getSecRem(remainingSeconds); //remaining seconds % 60
 
 		return { remainingHours ,remainingMinutes, seconds };
 	}
@@ -196,6 +197,8 @@ public:
 	void addOneSecond()
 	{
 		this->seconds++;
+		this->timeInSeconds++;
+
 		if (this->seconds == GLOBAL_CONSTANTS::MAX_MINUTES_AND_SECONDS)
 		{
 			this->seconds %= GLOBAL_CONSTANTS::MAX_MINUTES_AND_SECONDS;
@@ -205,11 +208,8 @@ public:
 
 	bool isItDinnerTime() const
 	{
-		if (this->hours < 20 || this->hours > 22) return false;
-		if (this->hours == 20 && this->minutes < 30) return false;
-		if (this->hours == 22 && this->minutes > 0) return false;
-
-		return true;
+		return timeInSeconds >= GLOBAL_CONSTANTS::START_OF_DINNER &&
+			timeInSeconds < GLOBAL_CONSTANTS::END_OF_DINNER;
 	}
 
 	bool isItPartyTime() const
@@ -233,7 +233,7 @@ public:
 
 	bool compareTimes(const Time& other) const
 	{
-		return this-> timeInSeconds >= other.timeInSeconds;
+		return this->timeInSeconds >= other.timeInSeconds;
 	}
 
 	void printTime() const
@@ -248,11 +248,9 @@ public:
 struct Times
 {
 	Time times[GLOBAL_CONSTANTS::MAX_NUMBER_OF_TIMES];
-	int currentTimes;
-};
+	int currentTimes = 0;
 
-namespace GLOBAL_FUNCTIONS
-{
+private:
 	void swapTimes(Time& t1, Time& t2)
 	{
 		Time temp = t1;
@@ -260,46 +258,59 @@ namespace GLOBAL_FUNCTIONS
 		t2 = temp;
 	}
 
-	void bubbleSort(Time* arrTime,int size)
+public:
+	void sort()
 	{
-		for (int i = 0; i < size - 1; ++i)
+		for (int i = 0; i < currentTimes - 1; ++i)
 		{
-			for (int j = 0; j < size - i - 1; ++j)
+			for (int j = 0; j < currentTimes - i - 1; ++j)
 			{
-				if (arrTime[j].compareTimes(arrTime[j + 1]))
-					swapTimes(arrTime[j], arrTime[j + 1]);
+				if (times[j].compareTimes(times[j + 1]))
+					swapTimes(times[j], times[j + 1]);
 			}
 		}
 	}
-}
+	
+	void readTimes()
+	{
+		std::cout << "Enter how many times do you want: ";
+		std::cin >> currentTimes;
+		if (currentTimes < 0 || currentTimes > GLOBAL_CONSTANTS::MAX_NUMBER_OF_TIMES)
+		{
+			std::cout << "The number must be between 0 and 10";
+			return;
+		}
+
+		std::cout << std::endl;
+		for (int i = 0; i < currentTimes; ++i)
+		{
+			std::cout << "Enter hours: ";
+			int hours = 0;
+			std::cin >> hours;
+			std::cout << "Enter minutes: ";
+			int minutes = 0;
+			std::cin >> minutes;
+			std::cout << "Enter seconds: ";
+			int seconds = 0;
+			std::cin >> seconds;
+			std::cout << std::endl;
+
+			times[i] = Time(hours, minutes, seconds);
+		}
+	}
+	
+	void printTimes() const
+	{
+		for (int i = 0; i < currentTimes; ++i)
+		{
+			std::cout << "Time " << i + 1 << " is: ";
+			times[i].printTime();
+		}
+	}
+};
 
 int main()
 {
-	Time t1(23, -1, 41);
-	Time t2(23, 41, 41);
-	Time t3(23, 34, 40);
-	Time t4(22, 16, 40);
-	Time t5(9, 54, 40);
-	Time t6(8, 40, 40);
-	Time t7(17, 40, 40);
-	Time t8(6, 40, 40);
-	Time t9(15, 40, 40);
-	Time t10(14, 23, 44);
-
-	Time times[10] = { t1,t2,t3,t4,t5,t6,t7,t8,t9,t10 };
-
-	for (int i = 0; i < 10; ++i)
-	{
-		times[i].printTime();
-	}
-
-	GLOBAL_FUNCTIONS::bubbleSort(times, GLOBAL_CONSTANTS::MAX_NUMBER_OF_TIMES);
-	std::cout << "after" << std::endl;
-
-	for (int i = 0; i < 10; ++i)
-	{
-		times[i].printTime();
-	}
 
 	return 0;
 }
