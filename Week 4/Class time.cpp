@@ -11,6 +11,7 @@ namespace GLOBAL_CONSTANTS
 	const int MAX_HOURS_IN_A_DAY = 24;
 	const int PARTY_START = 23;
 	const int PARTY_END = 6;
+	const int MAX_TIME_SIZE = 10;
 }
 
 class Time
@@ -76,6 +77,40 @@ private:
 			this->minutes %= GLOBAL_CONSTANTS::MAX_MINUTES_AND_SECONDS;
 			addOneHour();
 		}
+	}
+
+	void printHours() const
+	{
+		if (this->hours < 10) std::cout << "0";
+		std::cout << this->hours << ":";
+	} 
+
+	void printMinutes() const
+	{
+		if (this->minutes < 10) std::cout << "0";
+		std::cout << this->minutes << ":";
+	} 
+
+	void printSeconds()const
+	{
+		if (this->seconds < 10) std::cout << "0";
+		std::cout << this->seconds;
+	} 
+	//print ^
+
+	int getSecDifference(int seconds) const
+	{
+		return this->seconds - seconds;
+	}
+
+	int getMinuteDifference(int minutes) const
+	{
+		return this->minutes - minutes;
+	}
+
+	int getHourDifference(int hours) const
+	{
+		return this->hours - hours;
 	}
 
 public:
@@ -145,16 +180,6 @@ public:
 		}
 	}
 
-	void printTime() const
-	{
-		if (this->hours < 10) std::cout << "0";
-		std::cout << this->hours << ":";
-		if (this->minutes < 10) std::cout << "0";
-		std::cout << this->minutes << ":";
-		if (this->seconds < 10) std::cout << "0";
-		std::cout << this->seconds;
-	}
-
 	bool isItDinnerTime() const
 	{
 		if (this->hours < 20 || this->hours > 22) return false;
@@ -171,13 +196,67 @@ public:
 
 		return true;
 	}
+
+	const Time getDifferenceOfTimes(const Time& other) const
+	{
+		int newSeconds = getSecDifference(other.seconds);
+		int newMinutes = getMinuteDifference(other.minutes);
+		int newHours = getHourDifference(other.hours);
+
+		if (newSeconds < 0)
+		{
+			newSeconds = 60 + newSeconds;
+			newMinutes--;
+		}
+
+		if (newMinutes < 0)
+		{
+			newMinutes = 60 + newMinutes;
+			newHours--;
+		}
+
+		if (newHours < 0)
+		{
+			newHours = 24 + newHours;
+		}
+
+		return { newHours,newMinutes,newSeconds };
+	}
+
+	void compareTimes(const Time& other) const
+	{
+		int thisTotalSeconds = getAllSeconds(this->hours, this->minutes, this->seconds);
+		int otherTotalSeconds = getAllSeconds(other.hours, other.minutes, other.seconds);
+
+		if (thisTotalSeconds > otherTotalSeconds) std::cout << "Current time is later";
+		else if (thisTotalSeconds < otherTotalSeconds) std::cout << "Current time is earlier";
+		else std::cout << "Times are equal";
+	}
+
+	void printTime() const
+	{
+		printHours();
+		printMinutes();
+		printSeconds();
+	}
 };
+
+namespace GLOBAL_FUNCTIONS
+{
+	void bubbleSort(Time* arrTime)
+	{
+		for (int i = 0; i < GLOBAL_CONSTANTS::MAX_TIME_SIZE - 1; ++i)
+		{
+			for (int j = 0; j < GLOBAL_CONSTANTS::MAX_TIME_SIZE - i - 1; ++j)
+			{
+				
+			}
+		}
+	}
+}
 
 int main()
 {
-	Time test1(6, 0, 1);
-
-	std::cout << test1.isItPartyTime();
 
 	return 0;
 }
