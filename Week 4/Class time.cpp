@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 
 namespace GLOBAL_CONSTANTS
 {
@@ -98,6 +97,36 @@ private:
 		std::cout << this->seconds;
 	}
 	//print ^
+	bool validateHours(int hours)
+	{
+		if (hours < 0 || hours > 23) return false;
+		return true;
+	}
+
+	bool validateMinutes(int minutes)
+	{
+		if (minutes < 0 || minutes > 59) return false;
+		return true;
+	}
+
+	bool validateSeconds(int seconds)
+	{
+		if (seconds < 0 || seconds > 59) return false;
+		return true;
+	}
+
+	bool validate(int hours, int minutes, int sec)
+	{
+		return validateHours(hours) && validateMinutes(minutes) && validateSeconds(sec);
+	}
+
+	void bigSetter(int hours, int minutes, int seconds)
+	{
+		setHours(hours);
+		setMinutes(minutes);
+		setSeconds(seconds);
+		this->timeInSeconds = getAllSeconds();
+	}
 
 public:
 	Time() : hours(GLOBAL_CONSTANTS::DEFAULT_TIME),
@@ -107,29 +136,32 @@ public:
 
 	Time(int hours, int minutes, int seconds)
 	{
-		setHours(hours);
-		setMinutes(minutes);
-		setSeconds(seconds);
-		this->timeInSeconds = getAllSeconds();
+		if (!validate(hours, minutes, seconds)) 
+		{
+			bigSetter(GLOBAL_CONSTANTS::DEFAULT_TIME,
+				GLOBAL_CONSTANTS::DEFAULT_TIME,
+				GLOBAL_CONSTANTS::DEFAULT_TIME);
+		}
+		else
+		{
+			bigSetter(hours, minutes, seconds);
+		}
 	}
 
 	void setHours(int hours)
 	{
-		if (hours < 0 || hours > 23) return;
 		this->hours = hours;
 		this->timeInSeconds = getAllSeconds();
 	}
 
 	void setMinutes(int minutes)
 	{
-		if (minutes < 0 || minutes > 59) return;
 		this->minutes = minutes;
 		this->timeInSeconds = getAllSeconds();
 	}
 
 	void setSeconds(int seconds)
 	{
-		if (seconds < 0 || seconds > 59) return;
 		this->seconds = seconds;
 		this->timeInSeconds = getAllSeconds();
 	}
@@ -243,7 +275,7 @@ namespace GLOBAL_FUNCTIONS
 
 int main()
 {
-	Time t1(23, 41, 41);
+	Time t1(23, -1, 41);
 	Time t2(23, 41, 41);
 	Time t3(23, 34, 40);
 	Time t4(22, 16, 40);
