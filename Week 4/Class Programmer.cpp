@@ -5,10 +5,11 @@ namespace CONSTANTS
 	const int MAX_NAME_SIZE = 32;
 	const int MIN_AGE = 18;
 	const int MAX_AGE = 100;
-	const int MAX_SALARY = 500;
+	const int MAX_SALARY = 5000;
 	const int MIN_SALARY = 2500;
 	const char DEFAULT_NAME[] = "Unknown";
 	const int DEFAULT_VALUE = 0;
+	const int NUM_OF_LANGUAGES = 5;
 }
 
 class Programmer
@@ -17,8 +18,8 @@ private:
 	char name[CONSTANTS::MAX_NAME_SIZE];
 	int age;
 	int salary;
-	uint8_t language; //0,1,2,4,8,16 = not_assigned, c++, python, java, c#, javascript
-	
+	uint8_t language; //0,1,2,3,4 = c++, python, java, c#, javascript
+
 	void strCopy(const char* str)
 	{
 		int index = 0;
@@ -51,7 +52,7 @@ private:
 		if (!str) return false;
 		int len = strLen(str);
 
-		if (len < CONSTANTS::DEFFAULT_VALUE || len > CONSTANTS::MAX_NAME_SIZE) return false;
+		if (len < CONSTANTS::DEFAULT_VALUE || len > CONSTANTS::MAX_NAME_SIZE) return false;
 
 		return true;
 	}
@@ -65,23 +66,63 @@ private:
 
 	bool validateSalary(int salary) const
 	{
-		if (age < CONSTANTS::MIN_SALARY || age > CONSTANTS::MAX_SALARY) return false;
+		if (salary < CONSTANTS::MIN_SALARY || salary > CONSTANTS::MAX_SALARY) return false;
 
 		return true;
 	}
 
 	bool validateLanguage(int language) const
 	{
-		if (language > 16 || language <= 0) return false;
+		if (language > 4 || language < 0) return false;
 
-		while (!(language % 2)) language /= 2;
-		return language == 1;
+		return true;
 	}
 
 	bool validate(const char* str, int age, int salary, int language) const
 	{
 		return validateName(str) && validateAge(age)
-		&& validateSalary(salary) && validateLanguage(language);
+			&& validateSalary(salary) && validateLanguage(language);
+	}
+
+	void printName() const
+	{
+		std::cout << this->name;
+	}
+
+	void printAge() const
+	{
+		std::cout << this->age;
+	}
+
+	void printSalary() const
+	{
+		std::cout << this->salary;
+	}
+
+	void printLanguages() const
+	{
+		if (!this->language) std::cout << "not asigned";
+		int mask = 1;
+		for (int i = 0; i < CONSTANTS::NUM_OF_LANGUAGES; ++i)
+		{
+			if ((language >> i) & mask)
+			{
+				switch (i)
+				{
+				case 0: std::cout << "C++ ";
+					break;
+				case 1: std::cout << "Python ";
+					break;
+				case 2: std::cout << "java ";
+					break;
+				case 3: std::cout << "C# ";
+					break;
+				case 4: std::cout << "JavaSript ";
+					break;
+				default: break;
+				}
+			}
+		}
 	}
 
 public:
@@ -114,19 +155,74 @@ public:
 
 	void setSalary(int salary)
 	{
+		if (!validateSalary(salary))
+		{
+			this->salary = CONSTANTS::DEFAULT_VALUE;
+			return;
+		};
 		this->salary = salary;
 	}
 
 	void setLanguage(uint8_t language)
 	{
-		this->language = language;
+		int mask = 1;
+		this-> language =  (mask << language) | 1;
+	}
+
+	const char* getName() const
+	{
+		return this->name;
+	}
+
+	int getAge() const
+	{
+		return this->age;
+	}
+
+	int getSalary() const
+	{
+		return this->salary;
+	}
+
+	uint8_t getLangueges() const
+	{
+		return this->language;
+	}
+
+	void printProgrammer() const
+	{
+		std::cout << "|";
+		printName();
+		std::cout << "|";
+		printAge();
+		std::cout << "|";
+		printSalary();
+		std::cout << "|";
+		printLanguages();
+		std::cout << "\b" << "|" << std::endl;
+	}
+
+	void learnLanguage(uint8_t num)
+	{
+		if (num < 0 || num > 4)
+		{
+			std::cout << "invalid language";
+			return;
+		}
+		int mask = 1;
+		this-> language =  (mask << num) | this-> language;
 	}
 };
 
-
 int main()
 {
-	Programmer a("koki", 20, 3000, 4);
+	Programmer a("koki", 20, 3000, 3);
+	a.printProgrammer();
+	a.learnLanguage(1);
+	a.learnLanguage(2);
+	a.learnLanguage(3);
+	a.learnLanguage(4);
+	a.printProgrammer();
 
 	return 0;
 }
