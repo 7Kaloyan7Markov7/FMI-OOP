@@ -125,6 +125,11 @@ private:
 		}
 	}
 
+	void setAge(int age)
+	{
+		this->age = age;
+	}
+
 public:
 
 	Programmer() : age(CONSTANTS::MIN_AGE), salary(CONSTANTS::MIN_SALARY), language(CONSTANTS::DEFAULT_VALUE)
@@ -148,11 +153,6 @@ public:
 		strCopy(name);
 	}
 
-	void setAge(int age)
-	{
-		this->age = age;
-	}
-
 	void setSalary(int salary)
 	{
 		if (!validateSalary(salary))
@@ -166,7 +166,7 @@ public:
 	void setLanguage(uint8_t language)
 	{
 		int mask = 1;
-		this-> language =  (mask << language) | 1;
+		this-> language =  (mask << language);
 	}
 
 	const char* getName() const
@@ -216,7 +216,7 @@ public:
 
 int main()
 {
-	Programmer a("koki", 20, 3000, 3);
+	Programmer a("Pepi", 20, 3000, 0);
 	a.printProgrammer();
 	a.learnLanguage(1);
 	a.learnLanguage(2);
