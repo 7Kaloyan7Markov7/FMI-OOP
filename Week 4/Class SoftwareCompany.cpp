@@ -195,6 +195,14 @@ public:
 		int mask = 1;
 		this-> language =  (mask << num) | this-> language;
 	}
+
+	bool programmerCmp(const Programmer& other)
+	{
+		if (this->salary > other.salary) return true;
+		else if (this->salary == other.getSalary() && this->age > other.getAge()) return true;
+
+		return false;
+	}
 };
 
 class SoftwareCompany
