@@ -11,6 +11,7 @@ namespace CONSTANTS
 	const int DEFAULT_VALUE = 0;
 	const int NUM_OF_LANGUAGES = 5;
 	const int MAX_PROGRAMMERS = 50;
+	const double SALARY_RAISE = 1.1;
 }
 
 class Programmer
@@ -18,7 +19,7 @@ class Programmer
 private:
 	char name[CONSTANTS::MAX_NAME_SIZE];
 	int age;
-	int salary;
+	double salary;
 	uint8_t language; //0,1,2,3,4 = c++, python, java, c#, javascript
 
 	void strCopy(const char* str)
@@ -40,7 +41,7 @@ private:
 		return index;
 	}
 
-	void bigSetter(const char* name, int age, int salary, uint8_t language)
+	void bigSetter(const char* name, int age, double salary, uint8_t language)
 	{
 		setName(name);
 		setAge(age);
@@ -65,7 +66,7 @@ private:
 		return true;
 	}
 
-	bool validateSalary(int salary) const
+	bool validateSalary(double salary) const
 	{
 		if (salary < CONSTANTS::MIN_SALARY || salary > CONSTANTS::MAX_SALARY) return false;
 
@@ -79,7 +80,7 @@ private:
 		return true;
 	}
 
-	bool validate(const char* str, int age, int salary, int language) const
+	bool validate(const char* str, int age, double salary, int language) const
 	{
 		return validateName(str) && validateAge(age)
 			&& validateSalary(salary) && validateLanguage(language);
@@ -130,7 +131,7 @@ public:
 		strCopy(CONSTANTS::DEFAULT_NAME);
 	}
 
-	Programmer(const char* name, int age, int salary, int language)
+	Programmer(const char* name, int age, double salary, int language)
 	{
 		if (!validate(name, age, salary, language))
 		{
@@ -146,7 +147,7 @@ public:
 		strCopy(name);
 	}
 
-	void setSalary(int salary)
+	void setSalary(double salary)
 	{
 		if (!validateSalary(salary))
 		{
@@ -193,17 +194,22 @@ public:
 			return;
 		}
 		int mask = 1;
-		this-> language =  (mask << num) | this-> language;
+		this->language = (mask << num) | this->language;
 	}
 
 	bool programmerCmp(const Programmer& other)
 	{
 		if (this->salary > other.salary) return true;
-		else if (this->salary == other.getSalary() && this->age > other.getAge()) return true;
+		else if (this->salary == other.getSalary() && this->age >= other.getAge()) return true;
 
 		return false;
 	}
 };
+
+double increaseSalary(double salary) 
+{
+	return salary * CONSTANTS::SALARY_RAISE;
+}
 
 class SoftwareCompany
 {
@@ -216,10 +222,17 @@ private:
 		return currentProgrammers >= 0 && currentProgrammers < CONSTANTS::MAX_PROGRAMMERS;
 	}
 
+	void swap(Programmer& p1, Programmer& p2)
+	{
+		Programmer temp = p1;
+		p1 = p2;
+		p2 = temp;
+	}
+
 public:
 	SoftwareCompany() : currentProgrammers(CONSTANTS::DEFAULT_VALUE) {};
 
-	void addProgrammer(const char* name, int age, int salary, uint8_t language)
+	void addProgrammer(const char* name, int age, double salary, uint8_t language)
 	{
 		if (!validateCurrentProgrammers(currentProgrammers + 1))
 		{
@@ -233,6 +246,11 @@ public:
 	int getCurretProgrammers() const
 	{
 		return this->currentProgrammers;
+	}
+
+	const Programmer* getProgrammers() const
+	{
+		return this->programmers;
 	}
 
 	void printAll() const
@@ -294,18 +312,36 @@ public:
 
 		this->programmers[number - 1].learnLanguage(language);
 	}
+
+	void sort()
+	{
+		for (int i = 0; i < currentProgrammers - 1; ++i)
+		{
+			for (int j = 0; j < currentProgrammers - i - 1; ++j)
+			{
+				if (programmers[j].programmerCmp(programmers[j + 1]))
+				swap(programmers[j], programmers[j + 1]);
+			}
+		}
+	}
+
+	void raiseSalary(double (*predicate)(double), int programmerNo)
+	{
+		if (programmerNo < 0 || programmerNo > currentProgrammers)
+		{
+			std::cout << "Invalid programmerNo";
+			return;
+		}
+		programmers[programmerNo].setSalary(predicate(programmers[programmerNo].getSalary()));
+	}
 };
 
 int main()
 {
 	SoftwareCompany a;
 	a.addProgrammer("koki", 20, 3001, 0);
-	a.teachLanguage(1, 1);
-	a.addProgrammer("yoan", 24, 3000, 1);
-	a.addProgrammer("olq", 24, 3000, 0);
-	a.addProgrammer("ivo", 24, 3000, 0);
-	a.addProgrammer("ilian", 24, 3000, 0);
-	a.printByLanguage(0);
+	a.raiseSalary(increaseSalary, 0);
+	a.printAll();
 
 	return 0;
 }
