@@ -154,11 +154,38 @@ private:
 		if (countOfCars < 0 || countOfCars > CONSTANTS::MAX_CAR_COUNT) return false;
 		return true;
 	}
+
+	int strLen(const char* str) const
+	{
+		if (!str) return 0;
+		int index = 0;
+
+		while (str[index] != '\0') index++;
+
+		return  index;
+	}
+
+	bool strCmp(const char* first, const char* sec) const
+	{
+		int index = 0;
+		int size1 = strLen(first);
+		int size2 = strLen(sec);
+		if (size1 != size2) return false;
+
+		while (first[index] == sec[index] && first[index] != '\0') index++;
+
+		if (size1 == index) return true;
+		return false;
+	}
 public:
 
 	CarDealership(const Car* cars, int countOfCars)
 	{
-		if (!validateCount(countOfCars)) return;
+		if (!validateCount(countOfCars))
+		{
+			this->currentCount = 0;
+			return;
+		};
 		this->currentCount = countOfCars;
 
 		for (int i = 0; i < countOfCars; ++i)
@@ -169,15 +196,36 @@ public:
 
 	CarDealership(const Car* cars, int countOfCars, const Engine& engine)
 	{
-		if (!validateCount(countOfCars)) return;
-		this->currentCount = countOfCars;
+		if (!validateCount(countOfCars))
+		{
+			this->currentCount = 0;
+			return;
+		}
 		int index = 0;	
+
 		for (int i = 0; i < countOfCars; ++i)
 		{
 			if(cars[i].getEngine() == engine)
 			this->cars[index++] = cars[i];
 		}
-		this->currentCount = index - 1;
+		this->currentCount = index;
+	}
+
+	CarDealership(const Car* cars, int countOfCars, const char* model)
+	{
+		if (!validateCount(countOfCars))
+		{
+			this->currentCount = 0;
+			return;
+		}
+		int index = 0;
+
+		for (int i = 0; i < countOfCars; ++i)
+		{
+			if (strCmp(cars[i].getModel(), model))
+			this->cars[index++] = cars[i];
+		}
+		this->currentCount = index;
 	}
 
 	int getCurrentCount() const
@@ -187,23 +235,96 @@ public:
 
 	void addCar(const char* brand, const char* model, const Engine& engine, int price)
 	{
-		if (currentCount > CONSTANTS::MAX_CAR_COUNT) return;
+		if (currentCount >= CONSTANTS::MAX_CAR_COUNT) return;
 
-		cars[currentCount] = Car(brand, model, engine, price);
+		this->cars[currentCount] = Car(brand, model, engine, price);
 		currentCount++;
+	}
+
+	void removeCar(const char* brand, const char* model)
+	{
+		if (!brand || !model) return;
+
+		for (int i = 0; i < currentCount; ++i)
+		{
+			if (strCmp(cars[i].getBrand(), brand) &&
+				strCmp(cars[i].getModel(), model))
+			{
+				for (int j = i; j < currentCount - 1; ++j)
+				{
+					cars[j] = cars[j + 1];
+				}
+				currentCount -= 1;
+			}
+		}
 	}
 
 	void testDrive()
 	{
 		for (int i = 0; i < currentCount; ++i)
 		{
-			cars[i].drive(CONSTANTS::TEST_KILOMETER);
+			this->cars[i].drive(CONSTANTS::TEST_KILOMETER);
 		}
+	}
+
+	void printByModel(const char* model) const
+	{
+		for (int i = 0; i < currentCount; ++i)
+		{
+			if (strCmp(model, cars[i].getModel())) cars[i].print();
+		}
+	}
+
+	const Car mostExpensiveCar() const
+	{
+		if (!currentCount) return {};
+
+		int highestIndex = 0;
+		int highest = cars[0].getPrice();
+
+		for (int i = 1; i < currentCount; ++i)
+		{
+			if (cars[i].getPrice() > highest)
+			{
+				highest = cars[i].getPrice();
+				highestIndex = i;
+			}
+		}
+
+		return cars[highestIndex];
+	}
+
+	double getAveragePrice(const Car& car) const
+	{
+		if (!currentCount) return 0;
+
+		double sum = 0;
+		int countOfSameBrand = 0;
+
+		for (int i = 0; i < currentCount; ++i)
+		{
+			if (strCmp(cars[i].getBrand(), car.getBrand()))
+			{
+				countOfSameBrand++;
+				sum += cars[i].getPrice();
+			}
+		}
+
+		if (!countOfSameBrand) return 0;
+
+		return sum / countOfSameBrand;
 	}
 };
 
 int main()
 {
+	Car cars[] = {
+		Car("Toyota", "Corolla", Engine::GASOLINE, 15000),
+		Car("Toyota", "Camry", Engine::GASOLINE, 20000),
+		Car("Toyota", "RAV4", Engine::GASOLINE, 25000),
+		Car("Honda", "Civic", Engine::GASOLINE, 18000),
+		Car("Honda", "Accord", Engine::GASOLINE, 22000)
+	};
 
 	return 0;
 }
