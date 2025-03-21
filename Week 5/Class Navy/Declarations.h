@@ -64,6 +64,8 @@ private:
 	void copyFrom(const Navy& other);
 	void free();
 
+	int getWeaponsCount() const;
+
 public:
 	Navy() = default;
 	Navy(const Navy& other);
@@ -72,5 +74,8 @@ public:
 
 	void addShip(const Ship& ship);
 	void removeShip(const char* shipName);
+	const Ship& getShip(size_t pos) const;
+	size_t getCountOfShips() const;
+	int compareNavy(const Navy& other) const;
 
 };
