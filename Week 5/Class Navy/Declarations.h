@@ -57,11 +57,11 @@ public:
 class Navy
 {
 private:
-	char* countyName = nullptr;
+	char* countryName = nullptr;
 	Ship ships[CONSTANTS::MAX_SHIPS]{};
 	size_t currentShips = 0;
 
-	void copyFrom();
+	void copyFrom(const Navy& other);
 	void free();
 
 public:
@@ -69,5 +69,8 @@ public:
 	Navy(const Navy& other);
 	Navy& operator=(const Navy& other);
 	~Navy();
+
+	void addShip(const Ship& ship);
+	void removeShip(const char* shipName);
 
 };
