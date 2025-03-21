@@ -150,11 +150,107 @@ void Ship::print() const
 }
 
 
+
+int Navy::getWeaponsCount() const
+{
+	int sum = 0;
+	for (int i = 0; i < currentShips; ++i)
+	{
+		sum += ships[i].getWeaponsCount();
+	}
+
+	return sum;
+}
+
+void Navy::copyFrom(const Navy& other)
+{
+	strcpy(this->countryName, other.countryName);
+	this->currentShips = other.currentShips;
+
+	for (int i = 0; i < currentShips; ++i)
+	{
+		this->ships[i] = other.ships[i];
+	}
+}
+
+void Navy::free()
+{
+	currentShips = 0;
+	delete[] countryName;
+	countryName = nullptr;
+}
+
+Navy::Navy(const Navy& other)
+{
+	copyFrom(other);
+}
+
+Navy& Navy::operator=(const Navy& other)
+{
+	if (this != &other)
+	{
+		free();
+		copyFrom(other);
+	}
+
+	return *this;
+}
+
+Navy::~Navy()
+{
+	free();
+}
+
+void Navy::addShip(const Ship& ship)
+{
+	this->ships[currentShips] = ship;
+	currentShips++;
+}
+
+void Navy::removeShip(const char* shipName)
+{
+	for (int i = 0; i < currentShips; ++i)
+	{
+		if (ships[i].getShipName())
+		for (int j = i; i < currentShips - 1; ++j)
+		{
+			ships[i] = ships[i + 1];
+		}
+	}
+	currentShips--;
+}
+
+const Ship& Navy::getShip(size_t pos) const
+{
+	return ships[pos];
+}
+
+size_t Navy::getCountOfShips() const
+{
+	return currentShips;
+}
+
+int Navy::compareNavy(const Navy& other) const
+{
+	int thisCount = this->getWeaponsCount();
+	int otherCount = other.getWeaponsCount();
+
+	if (thisCount > otherCount) return 1;
+	else if (thisCount < otherCount) return -1;
+	else return 0;
+}
+
+
 int main()
 {
-	Ship a("Omed", 1920, ShipType::BB, 40);
+	Ship a("Koki", 1920, ShipType::BB, 40);
 	Ship b(a);
 
-	b.print();
+	Navy test1;
+	Navy test2;
+	test1.addShip(a);
+	test1.addShip(b);
+	std::cout << test1.getCountOfShips();
+	std::cout << test2.compareNavy(test1);
 	return 0;
 }
