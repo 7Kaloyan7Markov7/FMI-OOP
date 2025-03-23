@@ -100,7 +100,7 @@ public:
 class NavyHtmlTableGenerator
 {
 private:
-	Navy navy = Navy();
+	const &Navy navy;
 	char* fileName = nullptr;
 
 	bool validateFileName(const char* fileName) const;
