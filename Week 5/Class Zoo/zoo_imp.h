@@ -126,7 +126,7 @@ void Zoo::saveTypeToFile(std::ofstream& ofs, const AnimalType& type) const
 	case AnimalType::AMPHIBIAN: ofs << "Amphibian" << ","; break;
 	case AnimalType::IVERTEBRATES: ofs << "Ivertebrates" << ","; break;
 	case AnimalType::INSECT: ofs << "Insect" << ","; break;
-	default: break;
+	default: ofs << "Default" << ","; break;
 	}
 }
 
