@@ -33,7 +33,7 @@ public:
 		addNumber(num);
 	}
 	
-	void addNumber(int num) const
+	void addNumber(int num) 
 	{
 
 	}
