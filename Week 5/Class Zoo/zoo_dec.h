@@ -3,6 +3,7 @@
 
 class Zoo
 {
+//check
 private:
 	char* name = nullptr;
 	Animal*  animals = nullptr;
