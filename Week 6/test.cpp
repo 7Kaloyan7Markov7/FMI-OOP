@@ -9,7 +9,7 @@ private:
 
 	void resize(size_t capacity)
 	{
-		uint8_t 
+		
 	}
 	
 	void copyFrom(const BitSet& other)
